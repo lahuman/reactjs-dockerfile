@@ -1,5 +1,5 @@
 
-# ReactJS Proejct Docker 이미지 생성 하기
+# ReactJS Proejct Docker 이미지 생성 & 배포 하기
 
 ReactJS 프로젝트를 docker 이미지를 생성하는 방법을 정리 합니다.
 
