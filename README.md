@@ -1,68 +1,85 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# ReactJS Proejct Docker 이미지 생성 하기
 
-## Available Scripts
+ReactJS 프로젝트를 docker 이미지를 생성하는 방법을 정리 합니다.
 
-In the project directory, you can run:
+기본적으로 node 12.x 의 이미지에 nginx 이미지를 활용하여서 생성하였습니다.
 
-### `yarn start`
+자세한 내용은 [Dockerfile](/Dockerfile) 파일을 참고 하시면 됩니다.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+ReactJS 파일은 기본 명령어를 이용해서 생성하였습니다.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+```
+$ npx create-react-app mycode
+```
 
-### `yarn test`
+## 1. 우선 ReacJS 프로젝트에서 다음 파일을 생성합니다.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [Dockerfile](/Dockerfile)
+- [default.conf](/default.conf)
+- [expires.conf](/expires.conf)
 
-### `yarn build`
+## 2. 이미지 생성하기
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+다음 명령어를 이용해서 이미지를 생성 합니다.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+```
+# docker build -t ${image-name}:${version} .
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+$ docker build -t react-dockerfile:1.0 .
+```
 
-### `yarn eject`
+## 3. 이미지 테스트 하기
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+생성된 이미지를 docker run으로 테스트 합니다.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+아래 명령어는 이미지를 띄우고 **Ctrl + C**를 이용해서 종료 하면 바로 컨테이너를 삭제 합니다.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+# docker run -p 8888:80 --rm ${image-name}:${version}
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+$ docker run -p 8888:80 --rm react-dockerfile:1.0
+```
 
-## Learn More
+로컬 PC의 8888 포트와 컨테이너 80 포트를 연결 하여서 띄우기 때문에 http://localhost:8888 을 브라우저에서 입력하시고 결과를 확인해세요.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 4. 이미지를 docker repository에 올리기
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+마지막으로 만든 이미지에 문제가 없다면, 해당 이미지를 docker repository에 올립니다.
 
-### Code Splitting
+### 4.1 docker login 을 하세요.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+저장하려는 repository에 로그인 하세요 기본으로 로그인시 docker hub에 저장하게 됩니다.
 
-### Analyzing the Bundle Size
+```
+$ docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: lahuman
+Password:
+Login Succeeded
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+### 4.2 우선 이미지 태그를 다시 생성하셔요. 
 
-### Making a Progressive Web App
+docker 이미지 태그는 docker hub 계정 정보가 함께 들어 갑니다.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+```
+# docker tag ${image-name}:${version} ${account}/${image-name}:${version}
 
-### Advanced Configuration
+$ docker tag react-dockerfile:1.0 lahuman/react-dockerfile:1.0
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+### 4.3 push를 하세요
 
-### Deployment
+마지막으로 이미지를 docker hub에 push 하세요.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+```
+$ docker push ${account}/${image-name}:${version}
+$ docker push lahuman/react-dockerfile:1.0
+```
 
-### `yarn build` fails to minify
+## [오류] denied: requested access to the resource is denied
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+1. 로그인 정보를 확인하세요.
+2. tag에 계정 정보가 알맞게 저장 되었는지 확인하세요.
+
+
