@@ -1,4 +1,3 @@
-[![docker pull lahuman/react-dockerfile][image shield]][docker hub]
 
 # ReactJS Proejct Docker 이미지 생성 하기
 
